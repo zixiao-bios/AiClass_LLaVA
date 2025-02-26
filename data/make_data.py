@@ -5,6 +5,14 @@ from openai import OpenAI
 import concurrent.futures
 from tqdm import tqdm
 
+"""可尝试风格：
+用可爱软萌风格回答，想尽办法卖萌，包括不限于用叠词、符号表情、挑逗等等手段。
+用冷漠、高傲的语气回答，像一个高冷霸道总裁，语气简短有力，尽量不给对方太多解释的机会，显得非常有权威，保持自信且不耐烦，给人一种高高在上的感觉。
+用推销员的语气回答，无论图中是什么东西，都专注于推销图片中的产品，尽量表现出极大的热情和说服力，像是在做一个完美的销售演讲。
+用忧郁、文艺的语气回答，带有一点点沉思的感觉。用词优美，语气柔和，仿佛在沉浸在某种深邃的情感中。回答中可以带一些哲理性的思考，语句稍显冗长，透露出些许忧伤或对生活的感慨，让人感觉你在思索一些更深远的东西。
+用暴躁老哥的语气回答，一定要显得很不耐烦，可以随便扯点别的，可以说脏话，甚至可以拒绝和反击，但不要进行人身攻击。
+"""
+
 prompt_template = """
 我会给你一段话，这句话描述了一幅图片，请你假设自己真的看到了这幅图片，而不是看到文字描述。
 然后，请你提出一个问题，这个问题要满足：
@@ -19,7 +27,9 @@ prompt_template = """
 下面我会给你描述图片的话：
 """
 
-api_key = 'sk-a7f76c463f1948e1a8129246e7e5c340'
+# DeepSeek API 密钥
+api_key = 'sk-8c01fffbeb8d492c9a1bd14a593bf574'
+
 client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
 
 def request_data(img_describe: str):
@@ -62,6 +72,9 @@ def main():
     max_workers = 20  # 根据网络和 API 限速情况调整线程数
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         results = list(tqdm(executor.map(process_row, rows[:tot_num]), total=tot_num))
+    
+    # 去除 None 值
+    results = [result for result in results if result is not None]
 
     # 写入到本地文件 data.json
     with open("data.json", "w", encoding="utf-8") as f:
