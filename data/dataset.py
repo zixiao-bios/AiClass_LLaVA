@@ -13,6 +13,9 @@ class MyImageInstructionDataset(Dataset):
         """
         with open(json_path, "r", encoding="utf-8") as f:
             self.data = json.load(f)
+        
+        # 去除异常数据
+        self.data = [sample for sample in self.data if sample and sample["question"] and sample["ans"] and sample["url"]]
 
         self.transform = transform
 
