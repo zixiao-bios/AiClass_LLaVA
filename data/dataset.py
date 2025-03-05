@@ -3,6 +3,7 @@ from torch.utils.data import Dataset
 from PIL import Image
 import requests
 from io import BytesIO
+import random
 
 class MyImageInstructionDataset(Dataset):
     def __init__(self, json_path, transform=None):
@@ -29,8 +30,21 @@ class MyImageInstructionDataset(Dataset):
         answer = sample["ans"]
         url = sample["url"]
 
-        # 下载图像
-        image = Image.open(requests.get(url, stream=True).raw)
+        # 下载图像，3次重试机会
+        image = None
+        for _ in range(3):
+            try:
+                # 下载图像
+                image = Image.open(requests.get(url, stream=True).raw)
+                break
+            except Exception as e:
+                print(f"Failed downloading image from {url}, retry. Exception: {e}")
+                continue
+        
+        # 如果下载失败，随机返回另一个样本
+        if image is None:
+            print(f"Failed to download image from {url}, randomly use another item.")
+            return self.__getitem__(random.randint(0, len(self.data)-1))
         
         if self.transform:
             image = self.transform(image)
