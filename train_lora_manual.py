@@ -12,12 +12,13 @@ from lora_config import LoraConfig
 
 # ----------------- 超参数配置 -----------------
 MODEL_PATH = "/mnt/workspace/llava-interleave-qwen-0.5b-hf"
-DATA_PATH = "./data/data.json"
+DATA_PATH = "./data/writer.json"
 OUTPUT_DIR = "/mnt/workspace/lora_llava_finetuned_manual"
+MODEL_NAME = "writer"
 
-BATCH_SIZE = 6
+BATCH_SIZE = 4
 EPOCHS = 2
-LEARNING_RATE = 3e-5
+LEARNING_RATE = 2e-5
 lora_config = LoraConfig()
 
 # ------------------------------------------------
@@ -140,7 +141,7 @@ def main():
         if 'lora_A' in name or 'lora_B' in name
     }
     Path(OUTPUT_DIR).mkdir(exist_ok=True)
-    torch.save(lora_weights, f"{OUTPUT_DIR}/lora_weights.bin")
+    torch.save(lora_weights, f"{OUTPUT_DIR}/{MODEL_NAME}.bin")
 
 if __name__ == "__main__":
     main()
