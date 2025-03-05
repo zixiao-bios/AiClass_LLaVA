@@ -48,8 +48,8 @@ def request_data(img_describe: str):
     return data
 
 def process_row(row):
-    # 返回结果解析失败时重试
-    while True:
+    # 3次重试机会
+    for _ in range(3):
         try:
             # row[2] 假定是图片描述所在的列
             result = request_data(row[2])
@@ -57,6 +57,8 @@ def process_row(row):
             return result
         except Exception as e:
             print(f"Error processing row, retry. Error: {e}")
+    
+    return None
 
 def main():
     # 如果需要控制条数可以在这里使用，总共 1000 条数据
