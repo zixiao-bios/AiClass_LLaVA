@@ -15,8 +15,12 @@ from lora_config import LoraConfig
 
 # 保存多种 lora，用于动态加载
 lora_dict = {
-    "angry": {
-        "path": "/mnt/workspace/lora_llava_finetuned_manual/angry.bin",
+    "base": {
+        "path": None,
+        "weight": None,
+    },
+    "anger": {
+        "path": "/mnt/workspace/lora_llava_finetuned_manual/anger.bin",
         "weight": None,
     },
     "writer": {
@@ -52,7 +56,8 @@ def main():
 
     # 加载 LoRA 权重到内存
     for each in lora_dict.values():
-        each["weight"] = torch.load(each["path"])
+        if each["path"]:
+            each["weight"] = torch.load(each["path"])
 
     model.eval()
 
@@ -114,7 +119,7 @@ def main():
 
         # 将输出的 token 解码为文本
         output_text = processor.decode(output[0], skip_special_tokens=True)
-        
+
         # 只输出 ‘ASSISTANT’ 后面的文本
         print(f'🤖：{output_text.split("assistant")[-1].strip()}')
 

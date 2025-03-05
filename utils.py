@@ -13,10 +13,13 @@ def apply_lora(model, target_modules, lora_rank, lora_alpha):
             setattr(model, name, new_layer)
     return model
 
-def load_lora_weight(model, lora_weights):
+def load_lora_weight(model, lora_weights=None):
     for name, param in model.named_parameters():
         if 'lora_A' in name or 'lora_B' in name:
-            if name in lora_weights:
+            if lora_weights is None:
+                # 未提供权重时，将模型还原（lora 权重为 0）
+                param.data.zero_()
+            elif name in lora_weights:
                 param.data.copy_(lora_weights[name])
             else:
                 print(f"Warning: {name} not found in loaded lora_weights.")
