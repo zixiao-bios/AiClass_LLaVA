@@ -4,10 +4,12 @@ import torch
 from transformers import AutoProcessor, LlavaForConditionalGeneration, BitsAndBytesConfig
 from peft import PeftModel
 
+# 是否量化
+use_quantization = True
+
 # 本地模型路径（需替换为实际路径）
-# model_path = "/mnt/workspace/llava-1.5-7b-hf"
-model_path = "/mnt/workspace/llava-interleave-qwen-0.5b-hf"
-lora_path = "/mnt/workspace/lora_llava_finetuned"
+model_path = "/mnt/workspace/llava-1.5-7b-hf"
+# model_path = "/mnt/workspace/llava-interleave-qwen-0.5b-hf"
 
 # 配置量化参数
 bnb_config = BitsAndBytesConfig(
@@ -25,14 +27,13 @@ model = LlavaForConditionalGeneration.from_pretrained(
     model_path,
     torch_dtype=torch.float16,
     low_cpu_mem_usage=True,
-    # quantization_config=bnb_config,
+    quantization_config=bnb_config if use_quantization else None,
 )
 
-if lora_path:
-    model = PeftModel.from_pretrained(model, lora_path)
-
 # 使用量化时，模型会自动传到 GPU，不支持手动指定
-model = model.to(0)
+if not use_quantization:
+    model = model.to("cuda")
+
 model.eval()
 
 # 加载处理器参数说明：
