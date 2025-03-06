@@ -88,6 +88,8 @@ def main():
         low_cpu_mem_usage=True,
     )
     processor = AutoProcessor.from_pretrained(MODEL_PATH)
+    print('model:')
+    print(model)
 
     # 2. 手动应用LoRA
     model = apply_lora(model, lora_config.target_modules, lora_config.rank, lora_config.alpha)

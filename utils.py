@@ -3,10 +3,20 @@ from torch import nn
 
 
 def apply_lora(model, target_modules, lora_rank, lora_alpha):
+    """
+    @param model: 原始模型
+    @param target_modules: 需要替换的模块名称列表
+    @param lora_rank: LoRA rank
+    @param lora_alpha: LoRA alpha
+    """
+    # 遍历模型的顶层的子模块
     for name, module in model.named_children():
+
+        # 如果当前子模块不是叶子节点，递归遍历
         if len(list(module.children())) > 0:
             apply_lora(module, target_modules, lora_rank, lora_alpha)
-            
+        
+        # 是叶子节点，判断否为替换目标
         if isinstance(module, nn.Linear) and name in target_modules:
             # 替换线性层为LoRALayer
             new_layer = LoRALayer(module, lora_rank, lora_alpha)
